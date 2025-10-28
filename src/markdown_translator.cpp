@@ -62,22 +62,10 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent, co
             }
         }
     }
-
     markdownStream.clear();
     markdownStream.str(markdownContent);
 
-    // Start with basic HTML structure
-    htmlOutput << R"(<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>)" << title << R"(</title>
-    <link rel="stylesheet" href=")" << cssPath << R"(">
-</head>
-<body>
-)";
-
+    htmlOutput << buildHTMLHeader(title, cssPath);
     // Add navigation sidebar
     generateSideBar(htmlOutput, headers);
 
@@ -111,15 +99,7 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent, co
         htmlOutput << "            " << processLine(line);
     }
 
-    // Add article meta information section
-    htmlOutput << "            <div class=\"article-meta\">\n";
-    htmlOutput << "                <p>Last updated: " << getCurrentDateTime() << "</p>\n";
-    htmlOutput << "            </div>\n";
 
-    htmlOutput << "        </div>\n";
-    htmlOutput << "    </div>\n";
-    htmlOutput << "</body>\n";
-    htmlOutput << "</html>\n";
     return htmlOutput.str();
 }
 
@@ -180,16 +160,6 @@ std::string MarkdownTranslator::createAnchorId(const std::string& text) {
     );
 
     return id;
-}
-
-std::string MarkdownTranslator::getCurrentDateTime() {
-    std::time_t now = std::time(nullptr);
-    std::tm* localTime = std::localtime(&now);
-
-    char buffer[80];
-    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
-
-    return std::string(buffer);
 }
 
 std::string MarkdownTranslator::processLine(const std::string& line) {

@@ -36,7 +36,41 @@ private:
     void generateSideBar(std::stringstream& output, const std::vector<std::string>& headers);
     std::string createAnchorId(const std::string& text);
     // Utility functions
-    std::string getCurrentDateTime();
+
+    std::string getCurrentDateTime() {
+        std::time_t now = std::time(nullptr);
+        std::tm* localTime = std::localtime(&now);
+
+        char buffer[80];
+        std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localTime);
+
+        return std::string(buffer);
+    }
+
+    // HTML builders
+    std::string buildHTMLHeader(const std::string& title, const std::string& cssPath){
+        return R"(<!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>)" + title + R"(</title>
+            <link rel="stylesheet" href=")" + cssPath + R"(">
+        </head>
+        <body>
+        )";
+    }
+
+    std::string buildHTMLFooter(){
+                return R"( <div class="article-meta">
+                        <p>Last updated: )" + getCurrentDateTime() + R"(</p>
+                    </div>
+                </div>
+            </div>
+        </body>
+        </html>
+        )";
+    }
 
     // Member variables
     std::string title;
