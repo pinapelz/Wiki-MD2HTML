@@ -3,7 +3,7 @@
 #include <string>
 #include <sstream>
 #include <unordered_map>
-#include "markdown_translator.h"
+#include "markdown_translator.hpp"
 
 bool parseArguments(int argc, char* argv[], std::unordered_map<std::string, std::string>& params, std::string& inputFile) {
     if (argc < 2) {

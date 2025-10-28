@@ -1,4 +1,4 @@
-#include "markdown_translator.h"
+#include "markdown_translator.hpp"
 #include <regex>
 #include <iostream>
 #include <algorithm>
