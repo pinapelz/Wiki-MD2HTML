@@ -16,9 +16,21 @@ public:
     std::string translate(const std::string& markdownContent);
     std::string processLine(const std::string& line);
 
+    void addExternalMenuItem(const std::string& name, const std::string& link){
+        ExternalMenuItem menuItem{name, link};
+        externalMenuLinks.push_back(menuItem);
+    }
     enum Theme {
         carbon
     };
+
+    struct ExternalMenuItem{
+        std::string name;
+        std::string link;
+    };
+
+    std::vector<ExternalMenuItem> externalMenuLinks;
+
 
 private:
     // Regex for various tags
@@ -37,7 +49,8 @@ private:
     std::string processSingleFigure(const std::string& text);
     std::string processFigureBlock(const std::vector<std::string>& lines);
     // Navigation and table of contents
-    void generateSideBar(std::stringstream& output, const std::vector<std::string>& headers);
+    void prescanHeaders(std::stringstream& markdownStream);
+    void generateSideBar(std::stringstream& output);
     std::string createAnchorId(const std::string& text);
     // Utility functions
 
@@ -80,6 +93,7 @@ private:
         switch(theme){
             case Theme::carbon:
                 cssPath = "styles/carbon.css";
+                break;
             default:
                 cssPath = "styles/carbon.css";
         }
@@ -88,6 +102,8 @@ private:
     // Member variables
     std::string title;
     std::string cssPath{"styles/carbon.css"};
+    std::vector<std::string> headers; // h1-6
+
 };
 
 #endif // MARKDOWN_TRANSLATOR_H

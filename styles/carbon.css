@@ -106,7 +106,29 @@ body {
 
 .nav-submenu {
     list-style-type: none;
-    padding-left: 15px;
+    padding: 0;
+    margin: 0;
+}
+
+/* Indentation for nested submenu items */
+.nav-submenu li.level-2 a {
+    padding-left: 30px;
+}
+
+.nav-submenu li.level-3 a {
+    padding-left: 40px;
+}
+
+.nav-submenu li.level-4 a {
+    padding-left: 50px;
+}
+
+.nav-submenu li.level-5 a {
+    padding-left: 60px;
+}
+
+.nav-submenu li.level-6 a {
+    padding-left: 70px;
 }
 
 /* Main content */

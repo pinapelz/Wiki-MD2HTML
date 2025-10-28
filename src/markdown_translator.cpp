@@ -3,21 +3,66 @@
 #include <iostream>
 #include <algorithm>
 
-MarkdownTranslator::MarkdownTranslator() : title("WikiMD2HTML") {
+MarkdownTranslator::MarkdownTranslator() : title("WikiMD2HTML"), cssPath("styles/carbon.css") {
 
 }
 
 MarkdownTranslator::~MarkdownTranslator() {
 }
 
+void MarkdownTranslator::prescanHeaders(std::stringstream& markdownStream) {
+    auto savedPos = markdownStream.tellg();
+    markdownStream.seekg(0);
+    std::regex headerRegex(headerRegexStr);
+    std::smatch matches;
+    std::string line;
+    while (std::getline(markdownStream, line)) {
+        if (std::regex_match(line, matches, headerRegex)) {
+            int level = matches[1].length();
+            std::string content = matches[2];
+            headers.push_back(std::to_string(level) + ":" + content);
+        }
+    }
+    markdownStream.clear();
+    markdownStream.seekg(savedPos);
+}
+
+
 void MarkdownTranslator::processMetadata(const std::vector<std::string>& lines){
     // format of keys -> key: value
+    int externalLinkBuilderState{0};
+    std::string currExternalLinkName;
+    std::string currExternalLinkUrl;
     for(std::string currentLine : lines){
         size_t colonPos = currentLine.find(':');
         if (colonPos != std::string::npos) {
             std::string key = currentLine.substr(0, colonPos);
             std::string value = currentLine.substr(colonPos + 1);
             value.erase(0, value.find_first_not_of(" \t"));
+            if (key == "title") {
+                title = value;
+            }
+            else if (key == "external-name") {
+                currExternalLinkName = value;
+                externalLinkBuilderState = 1;
+            }
+            else if (key == "external-url") {
+                if (externalLinkBuilderState != 0) {
+                    currExternalLinkUrl = value;
+                    if (!currExternalLinkName.empty() && !currExternalLinkUrl.empty()) {
+                        addExternalMenuItem(currExternalLinkName, currExternalLinkUrl);
+                        currExternalLinkName = "";
+                        currExternalLinkUrl = "";
+                        externalLinkBuilderState = 0;
+                    }
+                }
+                else{
+                    std::cout << "[WARNING] Unexpected external-url \"" << value << "\" found with no matching external-name. Ignoring...";
+                }
+            }
+            else {
+                std::cerr << "ERROR OCCURED IN METADATA. UNKNOWN KEY" << std::endl;
+            }
             if (key == "title") {
                 title = value;
             }
@@ -29,7 +74,6 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent) {
     std::stringstream htmlOutput;
     std::stringstream markdownStream(markdownContent);
     std::string line;
-    std::vector<std::string> headers;
     std::string currentLine;
 
     // Parse metadata section if it exists
@@ -48,8 +92,12 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent) {
     // Process and apply metadata to curr object
     if(metadataExists)
         processMetadata(metadataLines);
+
+    // Pre-scan for headers before generating sidebar
+    prescanHeaders(markdownStream);
+
     htmlOutput << buildHTMLHeader(title);
-    generateSideBar(htmlOutput, headers);
+    generateSideBar(htmlOutput);
     // Main content container
     htmlOutput << "    <div class=\"main-content\">\n";
     htmlOutput << "        <div class=\"container\">\n";
@@ -81,23 +129,24 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent) {
     }
 
 
+
     return htmlOutput.str();
 }
 
-void MarkdownTranslator::generateSideBar(std::stringstream& output, const std::vector<std::string>& headers) {
+void MarkdownTranslator::generateSideBar(std::stringstream& output) {
     output << "    <div class=\"nav-sidebar\">\n";
     output << "        <div class=\"nav-logo\">\n";
     output << "            <h3>" + title + "</h3>\n";
     output << "        </div>\n";
     output << "        <ul class=\"nav-menu\">\n";
-
+    if(externalMenuLinks.size() > 0){
+        for(const ExternalMenuItem& menuItem : externalMenuLinks){
+            output << "            <li><a href=\""+menuItem.link+"\">"+menuItem.name+"</a></li>\n";
+        }
+    }
     output << "            <h4>Table of Contents</h4>\n";
-    output << "            <li><a href=\"index.html\">Home</a></li>\n";
-    output << "            <li><a href=\"#\">Recent Changes</a></li>\n";
-    output << "            <li><a href=\"#\">Random Page</a></li>\n";
     output << "            <ul class=\"nav-submenu\">\n";
 
-    // Generate navigation from headers
     for (const auto& header : headers) {
         size_t separatorPos = header.find(':');
         if (separatorPos != std::string::npos) {
@@ -108,12 +157,12 @@ void MarkdownTranslator::generateSideBar(std::stringstream& output, const std::v
             std::string anchorId = createAnchorId(content);
 
             // Add indentation based on header level
-            std::string indentation = "";
+            std::string indentation = "                ";
             for (int i = 1; i < level; ++i) {
                 indentation += "    ";
             }
 
-            output << "                " << indentation << "<li><a href=\"#" << anchorId << "\">" << content << "</a></li>\n";
+            output << indentation << "<li class=\"level-" << level << "\"><a href=\"#" << anchorId << "\">" << content << "</a></li>\n";
         }
     }
 
