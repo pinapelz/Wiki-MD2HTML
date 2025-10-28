@@ -8,9 +8,7 @@
 
 class MarkdownTranslator {
 public:
-    // Constructor
     MarkdownTranslator();
-    // Destructor
     ~MarkdownTranslator();
     // Main translation function - takes markdown content and returns HTML
     std::string translate(const std::string& markdownContent);

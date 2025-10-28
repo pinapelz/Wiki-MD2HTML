@@ -88,6 +88,9 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent) {
             metadataLines.push_back(currentLine);
         }
     }
+    else {
+        markdownStream.seekg(0);
+    }
 
     // Process and apply metadata to curr object
     if(metadataExists)
@@ -127,8 +130,6 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent) {
 
         htmlOutput << "            " << processLine(line);
     }
-
-
 
     return htmlOutput.str();
 }
