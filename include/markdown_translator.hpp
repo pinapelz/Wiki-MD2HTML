@@ -13,8 +13,12 @@ public:
     // Destructor
     ~MarkdownTranslator();
     // Main translation function - takes markdown content and returns HTML
-    std::string translate(const std::string& markdownContent, const std::string& cssPath = "styles/carbon.css");
+    std::string translate(const std::string& markdownContent);
     std::string processLine(const std::string& line);
+
+    enum Theme {
+        carbon
+    };
 
 private:
     // Regex for various tags
@@ -48,7 +52,7 @@ private:
     }
 
     // HTML builders
-    std::string buildHTMLHeader(const std::string& title, const std::string& cssPath){
+    std::string buildHTMLHeader(const std::string& title){
         return R"(<!DOCTYPE html>
         <html lang="en">
         <head>
@@ -72,8 +76,18 @@ private:
         )";
     }
 
+    void setTheme(const Theme& theme){
+        switch(theme){
+            case Theme::carbon:
+                cssPath = "styles/carbon.css";
+            default:
+                cssPath = "styles/carbon.css";
+        }
+    }
+
     // Member variables
     std::string title;
+    std::string cssPath{"styles/carbon.css"};
 };
 
 #endif // MARKDOWN_TRANSLATOR_H

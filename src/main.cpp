@@ -64,12 +64,12 @@ int main(int argc, char* argv[]) {
     MarkdownTranslator translator;
 
     // Get CSS path from parameters or use default
-    std::string cssPath = "styles/ffxiv-style.css";
+    std::string cssPath = "";
     if (params.find("-css") != params.end()) {
         cssPath = params["-css"];
     }
 
-    std::string htmlOutput = translator.translate(markdownContent, cssPath);
+    std::string htmlOutput = translator.translate(markdownContent);
 
     // Write to output file
     std::string outputFile = params["-o"];

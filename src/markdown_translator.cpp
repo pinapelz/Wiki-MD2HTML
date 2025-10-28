@@ -3,7 +3,7 @@
 #include <iostream>
 #include <algorithm>
 
-MarkdownTranslator::MarkdownTranslator() : title("Carbon") {
+MarkdownTranslator::MarkdownTranslator() : title("WikiMD2HTML") {
 
 }
 
@@ -25,50 +25,31 @@ void MarkdownTranslator::processMetadata(const std::vector<std::string>& lines){
     }
 }
 
-std::string MarkdownTranslator::translate(const std::string& markdownContent, const std::string& cssPath) {
+std::string MarkdownTranslator::translate(const std::string& markdownContent) {
     std::stringstream htmlOutput;
     std::stringstream markdownStream(markdownContent);
     std::string line;
     std::vector<std::string> headers;
-
     std::string currentLine;
 
+    // Parse metadata section if it exists
     bool metadataExists{false};
     std::vector<std::string> metadataLines;
-    while (std::getline(markdownStream, currentLine)) {
-        if(currentLine == "---"){
-            if(metadataExists){
+    if (std::getline(markdownStream, currentLine) && currentLine == "---") {
+        metadataExists = true;
+        while (std::getline(markdownStream, currentLine)) {
+            if (currentLine == "---") {
                 break;
-            } else {
-                metadataExists = true;
-                continue;
             }
-        }
-        if(!metadataExists){
-            break;
-        }
-        metadataLines.push_back(currentLine);
-    }
-    processMetadata(metadataLines);
-
-    while (std::getline(markdownStream, currentLine)) {
-        std::regex headerRegex("^(#{1,3})\\s+(.*)$");
-        std::smatch matches;
-        if (std::regex_match(currentLine, matches, headerRegex)) {
-            int level = matches[1].length();
-            std::string content = matches[2];
-            if (level <= 3) {
-                headers.push_back(std::to_string(level) + ":" + content);
-            }
+            metadataLines.push_back(currentLine);
         }
     }
-    markdownStream.clear();
-    markdownStream.str(markdownContent);
 
-    htmlOutput << buildHTMLHeader(title, cssPath);
-    // Add navigation sidebar
+    // Process and apply metadata to curr object
+    if(metadataExists)
+        processMetadata(metadataLines);
+    htmlOutput << buildHTMLHeader(title);
     generateSideBar(htmlOutput, headers);
-
     // Main content container
     htmlOutput << "    <div class=\"main-content\">\n";
     htmlOutput << "        <div class=\"container\">\n";
