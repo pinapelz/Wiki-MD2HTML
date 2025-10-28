@@ -17,6 +17,12 @@ public:
     std::string processLine(const std::string& line);
 
 private:
+    // Regex for various tags
+    const std::string headerRegexStr{"^(#{1,6})\\s+(.*)$"};
+    const std::string boldRegexStr{"\\*\\*([^\\*]+)\\*\\*|__([^_]+)__"};
+    const std::string italicRegexStr{"\\*([^\\*]+)\\*|_([^_]+)_"};
+    const std::string linkRegexStr{"\\[([^\\]]+)\\]\\(([^\\)]+)\\)"};
+    const std::string imageRegexStr{"!\\[(.*?)\\]\\(([^\\s\"]+)(\\s+\"(.*?)\")?\\)"};
     // Helper functions for different markdown elements
     void processMetadata(const std::vector<std::string>& lines);
     std::string processHeaders(const std::string& line);

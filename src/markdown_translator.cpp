@@ -67,15 +67,16 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent, co
     markdownStream.str(markdownContent);
 
     // Start with basic HTML structure
-    htmlOutput << "<!DOCTYPE html>\n";
-    htmlOutput << "<html lang=\"en\">\n";
-    htmlOutput << "<head>\n";
-    htmlOutput << "    <meta charset=\"UTF-8\">\n";
-    htmlOutput << "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n";
-    htmlOutput << "    <title>" + title + "</title>\n";
-    htmlOutput << "    <link rel=\"stylesheet\" href=\"" << cssPath << "\">\n";
-    htmlOutput << "</head>\n";
-    htmlOutput << "<body>\n";
+    htmlOutput << R"(<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>)" << title << R"(</title>
+    <link rel="stylesheet" href=")" << cssPath << R"(">
+</head>
+<body>
+)";
 
     // Add navigation sidebar
     generateSideBar(htmlOutput, headers);
@@ -208,7 +209,7 @@ std::string MarkdownTranslator::processLine(const std::string& line) {
 
 std::string MarkdownTranslator::processHeaders(const std::string& line) {
     // Check for H1-H6
-    std::regex headerRegex("^(#{1,6})\\s+(.*)$");
+    std::regex headerRegex(headerRegexStr);
     std::smatch matches;
     if (std::regex_match(line, matches, headerRegex)) {
         int level = matches[1].length();
@@ -223,7 +224,7 @@ std::string MarkdownTranslator::processHeaders(const std::string& line) {
 std::string MarkdownTranslator::processBold(const std::string& text) {
      // Replace **text** or __text__ with <strong>text</strong>
     std::string result = text;
-    std::regex boldRegex("\\*\\*([^\\*]+)\\*\\*|__([^_]+)__");
+    std::regex boldRegex(boldRegexStr);
     result = std::regex_replace(result, boldRegex, "<strong>$1$2</strong>");
     return result;
 }
@@ -231,7 +232,7 @@ std::string MarkdownTranslator::processBold(const std::string& text) {
 std::string MarkdownTranslator::processItalic(const std::string& text) {
     // Replace *text* or _text_ with <em>text</em>
     std::string result = text;
-    std::regex italicRegex("\\*([^\\*]+)\\*|_([^_]+)_");
+    std::regex italicRegex(italicRegexStr);
     result = std::regex_replace(result, italicRegex, "<em>$1$2</em>");
     return result;
 }
@@ -239,7 +240,7 @@ std::string MarkdownTranslator::processItalic(const std::string& text) {
 std::string MarkdownTranslator::processLinks(const std::string& text) {
     // Replace [text](url) with <a href="url">text</a>
     std::string result = text;
-    std::regex linkRegex("\\[([^\\]]+)\\]\\(([^\\)]+)\\)");
+    std::regex linkRegex(linkRegexStr);
     result = std::regex_replace(result, linkRegex, "<a href=\"$2\">$1</a>");
     return result;
 }
@@ -251,7 +252,7 @@ std::string MarkdownTranslator::processParagraph(const std::string& text) {
 
 std::string MarkdownTranslator::processSingleFigure(const std::string& text) {
     // Extract image details using regex
-    std::regex imageRegex("!\\[(.*?)\\]\\(([^\\s\"]+)(\\s+\"(.*?)\")?\\)");
+    std::regex imageRegex(imageRegexStr);
     std::smatch matches;
 
     if (std::regex_search(text, matches, imageRegex)) {
