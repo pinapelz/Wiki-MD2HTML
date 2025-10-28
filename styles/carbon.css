@@ -148,7 +148,6 @@ body {
     box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
 }
 
-/* Headers with FFXIV styling */
 h1,
 h2,
 h3,
@@ -169,7 +168,7 @@ h1 {
     font-size: 2.2em;
     padding-bottom: 0.5em;
     border-bottom: 3px solid var(--accent-gold);
-    background: linear-gradient(90deg, var(--accent-gold), transparent 70%);
+    background: var(--accent-gold);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
