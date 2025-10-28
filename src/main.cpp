@@ -69,7 +69,7 @@ int main(int argc, char* argv[]) {
         cssPath = params["-css"];
     }
 
-    std::string htmlOutput = translator.translate(markdownContent, cssPath, "XIV Lore");
+    std::string htmlOutput = translator.translate(markdownContent, cssPath);
 
     // Write to output file
     std::string outputFile = params["-o"];

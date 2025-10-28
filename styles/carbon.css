@@ -1,8 +1,5 @@
-/* FFXIV Wiki-inspired CSS */
-/* Base typography and colors inspired by the Lodestone and Wiki style */
-
+/*Carbon themed CSS*/
 :root {
-    /* Color palette inspired by FFXIV UI */
     --primary-bg: #1a1a1a;
     --secondary-bg: #252525;
     --tertiary-bg: #2d2d2d;

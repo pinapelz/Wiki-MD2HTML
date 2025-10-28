@@ -13,11 +13,12 @@ public:
     // Destructor
     ~MarkdownTranslator();
     // Main translation function - takes markdown content and returns HTML
-    std::string translate(const std::string& markdownContent, const std::string& cssPath = "styles/ffxiv-style.css", const std::string& title = "Title");
+    std::string translate(const std::string& markdownContent, const std::string& cssPath = "styles/carbon.css");
     std::string processLine(const std::string& line);
 
 private:
     // Helper functions for different markdown elements
+    void processMetadata(const std::vector<std::string>& lines);
     std::string processHeaders(const std::string& line);
     std::string processBold(const std::string& text);
     std::string processItalic(const std::string& text);
@@ -26,10 +27,13 @@ private:
     std::string processSingleFigure(const std::string& text);
     std::string processFigureBlock(const std::vector<std::string>& lines);
     // Navigation and table of contents
-    void generateSideBar(std::stringstream& output, const std::vector<std::string>& headers, const std::string& title);
+    void generateSideBar(std::stringstream& output, const std::vector<std::string>& headers);
     std::string createAnchorId(const std::string& text);
     // Utility functions
     std::string getCurrentDateTime();
+
+    // Member variables
+    std::string title;
 };
 
 #endif // MARKDOWN_TRANSLATOR_H

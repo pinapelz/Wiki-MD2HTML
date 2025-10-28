@@ -3,13 +3,29 @@
 #include <iostream>
 #include <algorithm>
 
-MarkdownTranslator::MarkdownTranslator(){
+MarkdownTranslator::MarkdownTranslator() : title("Carbon") {
+
 }
 
 MarkdownTranslator::~MarkdownTranslator() {
 }
 
-std::string MarkdownTranslator::translate(const std::string& markdownContent, const std::string& cssPath, const std::string& title) {
+void MarkdownTranslator::processMetadata(const std::vector<std::string>& lines){
+    // format of keys -> key: value
+    for(std::string currentLine : lines){
+        size_t colonPos = currentLine.find(':');
+        if (colonPos != std::string::npos) {
+            std::string key = currentLine.substr(0, colonPos);
+            std::string value = currentLine.substr(colonPos + 1);
+            value.erase(0, value.find_first_not_of(" \t"));
+            if (key == "title") {
+                title = value;
+            }
+        }
+    }
+}
+
+std::string MarkdownTranslator::translate(const std::string& markdownContent, const std::string& cssPath) {
     std::stringstream htmlOutput;
     std::stringstream markdownStream(markdownContent);
     std::string line;
@@ -17,6 +33,23 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent, co
 
     std::string currentLine;
 
+    bool metadataExists{false};
+    std::vector<std::string> metadataLines;
+    while (std::getline(markdownStream, currentLine)) {
+        if(currentLine == "---"){
+            if(metadataExists){
+                break;
+            } else {
+                metadataExists = true;
+                continue;
+            }
+        }
+        if(!metadataExists){
+            break;
+        }
+        metadataLines.push_back(currentLine);
+    }
+    processMetadata(metadataLines);
 
     while (std::getline(markdownStream, currentLine)) {
         std::regex headerRegex("^(#{1,3})\\s+(.*)$");
@@ -30,7 +63,6 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent, co
         }
     }
 
-    // Reset the stream to start over
     markdownStream.clear();
     markdownStream.str(markdownContent);
 
@@ -46,7 +78,7 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent, co
     htmlOutput << "<body>\n";
 
     // Add navigation sidebar
-    generateSideBar(htmlOutput, headers, title);
+    generateSideBar(htmlOutput, headers);
 
     // Main content container
     htmlOutput << "    <div class=\"main-content\">\n";
@@ -90,7 +122,7 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent, co
     return htmlOutput.str();
 }
 
-void MarkdownTranslator::generateSideBar(std::stringstream& output, const std::vector<std::string>& headers, const std::string& title) {
+void MarkdownTranslator::generateSideBar(std::stringstream& output, const std::vector<std::string>& headers) {
     output << "    <div class=\"nav-sidebar\">\n";
     output << "        <div class=\"nav-logo\">\n";
     output << "            <h3>" + title + "</h3>\n";
@@ -161,17 +193,11 @@ std::string MarkdownTranslator::getCurrentDateTime() {
 
 std::string MarkdownTranslator::processLine(const std::string& line) {
     std::string processed = line;
-
-    // Check for headers first (they start at beginning of line)
     processed = processHeaders(processed);
-
-    // If it wasn't a header, process inline elements
     if (processed == line) {
         processed = processBold(processed);
         processed = processItalic(processed);
         processed = processLinks(processed);
-
-        // Wrap in paragraph tags if it's regular text
         if (!processed.empty() && processed[0] != '<') {
             processed = processParagraph(processed);
         }
@@ -232,7 +258,6 @@ std::string MarkdownTranslator::processSingleFigure(const std::string& text) {
         std::string alt = matches[1].str();
         std::string src = matches[2].str();
         std::string title = matches.size() > 4 && matches[4].matched ? " title=\"" + matches[4].str() + "\"" : "";
-        // Create the HTML for the image
         return "<img src=\"" + src + "\" alt=\"" + alt + "\"" + title + ">";
     }
     return text;
