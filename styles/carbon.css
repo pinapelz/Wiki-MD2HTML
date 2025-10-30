@@ -286,22 +286,17 @@ blockquote {
     background: linear-gradient(90deg, rgba(201, 170, 113, 0.1), transparent);
     padding: 15px 20px;
     margin: 1.5em 0;
-    font-style: italic;
     color: var(--text-secondary);
     position: relative;
 }
 
 blockquote::before {
-    content: '"';
     font-size: 3em;
     color: var(--accent-gold);
     opacity: 0.3;
     position: absolute;
-    top: -10px;
-    left: 10px;
 }
 
-/* Tables with FFXIV UI styling */
 table {
     width: 100%;
     border-collapse: separate;
@@ -603,7 +598,6 @@ img {
         font-size: 1.3em;
     }
 }
-Blockquote
 /* Animation for page load */
 @keyframes fadeIn {
     from {

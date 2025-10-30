@@ -110,6 +110,7 @@ private:
         REGULAR,
         IN_FIGURE,
         IN_CODEBLOCK,
+        IN_BLOCKQUOTE
     };
 
 };

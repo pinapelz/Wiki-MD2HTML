@@ -149,6 +149,20 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent) {
             continue;
         }
 
+        if(line.find(">") == 0 && parseState != MarkdownTranslator::ParseState::IN_BLOCKQUOTE){
+            parseState = MarkdownTranslator::ParseState::IN_BLOCKQUOTE;
+            htmlOutput << "            <blockquote>";
+            htmlOutput << "            " << processLine(line.substr(1));
+            continue;
+        }
+        else if(parseState == MarkdownTranslator::ParseState::IN_BLOCKQUOTE && line.find(">") != 0 ){ // End of blockquote
+            parseState = MarkdownTranslator::ParseState::REGULAR;
+            htmlOutput << "            </blockquote>";
+        }
+        else if(parseState == MarkdownTranslator::ParseState::IN_BLOCKQUOTE){
+             htmlOutput << "            " << processLine(line.substr(1));
+             continue;
+        }
         htmlOutput << "            " << processLine(line);
     }
 
