@@ -108,28 +108,51 @@ std::string MarkdownTranslator::translate(const std::string& markdownContent) {
     // Process each line of markdown
 
     // State of current parse
-    bool inFigureBlock{false};
+    MarkdownTranslator::ParseState parseState = MarkdownTranslator::ParseState::REGULAR;
     std::vector<std::string> figureLines;
 
-    while (std::getline(markdownStream, line)) {
+    std::vector<std::string> codeblockLines;
+    std::string language;
+
+    while (std::getline(markdownStream, line)) { // Start of figure block
         if(line.find(":::figure") == 0){
-            inFigureBlock = true;
+            parseState = MarkdownTranslator::ParseState::IN_FIGURE;
             figureLines.clear();
             continue;
         }
-
-        if(inFigureBlock && line == ":::"){
-            inFigureBlock = false;
+        if(parseState == MarkdownTranslator::ParseState::IN_FIGURE && line == ":::"){ // End of figure block
+            parseState = MarkdownTranslator::ParseState::REGULAR;
             htmlOutput << "            " << processFigureBlock(figureLines) << "\n";
             continue;
         }
-        else if(inFigureBlock){
+        else if(parseState == MarkdownTranslator::ParseState::IN_FIGURE){
             figureLines.push_back(line);
+            continue;
+        }
+
+        if(line.find("```") == 0 && parseState != MarkdownTranslator::ParseState::IN_CODEBLOCK){
+            parseState = MarkdownTranslator::ParseState::IN_CODEBLOCK;
+            codeblockLines.clear();
+            if(line.length() > 3) {
+                language = line.substr(3);
+            }
+            std::cout << language << std::endl;
+            continue;
+        }
+        else if(parseState == MarkdownTranslator::ParseState::IN_CODEBLOCK && line == "```"){ // End of figure block
+            parseState = MarkdownTranslator::ParseState::REGULAR;
+            htmlOutput << "            " << processCodeBlock(language, codeblockLines) << "\n";
+            continue;
+        }
+        else if(parseState == MarkdownTranslator::ParseState::IN_CODEBLOCK){
+            codeblockLines.push_back(line);
             continue;
         }
 
         htmlOutput << "            " << processLine(line);
     }
+
+    htmlOutput << buildHTMLFooter();
 
     return htmlOutput.str();
 }
@@ -287,5 +310,32 @@ std::string MarkdownTranslator::processFigureBlock(const std::vector<std::string
         }
     }
     html << "</figure>";
+    return html.str();
+}
+
+std::string htmlEscape(const std::string& text) {
+    std::string escaped;
+    escaped.reserve(text.size());
+    for (char c : text) {
+        switch (c) {
+            case '&': escaped += "&amp;"; break;
+            case '<': escaped += "&lt;"; break;
+            case '>': escaped += "&gt;"; break;
+            case '"': escaped += "&quot;"; break;
+            case '\'': escaped += "&#39;"; break;
+            default: escaped += c; break;
+        }
+    }
+    return escaped;
+}
+std::string MarkdownTranslator::processCodeBlock(
+    const std::string& language,
+    const std::vector<std::string>& lines
+) {
+    std::stringstream html;
+    html << "<pre><code class=\"language-"<< language <<"\">";
+    for (const auto& line : lines)
+        html << htmlEscape(line) << '\n';
+    html << "</code></pre>";
     return html.str();
 }

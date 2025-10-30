@@ -19,7 +19,7 @@ public:
         externalMenuLinks.push_back(menuItem);
     }
     enum Theme {
-        carbon
+        CARBON
     };
 
     struct ExternalMenuItem{
@@ -46,6 +46,7 @@ private:
     std::string processParagraph(const std::string& text);
     std::string processSingleFigure(const std::string& text);
     std::string processFigureBlock(const std::vector<std::string>& lines);
+    std::string processCodeBlock(const std::string& language, const std::vector<std::string>& lines);
     // Navigation and table of contents
     void prescanHeaders(std::stringstream& markdownStream);
     void generateSideBar(std::stringstream& output);
@@ -71,6 +72,7 @@ private:
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>)" + title + R"(</title>
             <link rel="stylesheet" href=")" + cssPath + R"(">
+            <link href="https://unpkg.com/prism-themes@1.6.0/themes/prism-atom-dark.css" rel="stylesheet">
         </head>
         <body>
         )";
@@ -82,6 +84,8 @@ private:
                     </div>
                 </div>
             </div>
+            <script src="https://unpkg.com/prismjs@1.30.0/prism.js"></script>
+            <script src="https://unpkg.com/prismjs@1.30.0/plugins/autoloader/prism-autoloader.min.js"></script>
         </body>
         </html>
         )";
@@ -89,7 +93,7 @@ private:
 
     void setTheme(const Theme& theme){
         switch(theme){
-            case Theme::carbon:
+            case Theme::CARBON:
                 cssPath = "styles/carbon.css";
                 break;
             default:
@@ -101,6 +105,12 @@ private:
     std::string title;
     std::string cssPath{"styles/carbon.css"};
     std::vector<std::string> headers; // h1-6
+
+    enum ParseState {
+        REGULAR,
+        IN_FIGURE,
+        IN_CODEBLOCK,
+    };
 
 };
 
