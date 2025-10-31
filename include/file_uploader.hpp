@@ -7,7 +7,7 @@
 class FileUploader {
 public:
     virtual ~FileUploader() = default;
-    virtual bool uploadFile(const std::string& filepath, const std::string& remotePath) = 0;
+    virtual std::string uploadFile(const std::string& filepath, const std::string& remotePath) = 0; // expects public url
     virtual bool testConnection() = 0;
 };
 

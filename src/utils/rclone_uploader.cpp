@@ -20,10 +20,10 @@ RcloneUploader::RcloneUploader(const std::string& cdnEndpoint,
     }
 }
 
-bool RcloneUploader::uploadFile(const std::string& filepath, const std::string& remotePath=""){
+std::string RcloneUploader::uploadFile(const std::string& filepath, const std::string& remotePath=""){
     std::string command = "rclone copy \"" + filepath + "\" " + sourceName + ":" + remotePath + " 2>/dev/null 1>/dev/null";
     int result = std::system(command.c_str());
-    return result == 0;
+    return "";
 }
 
 bool RcloneUploader::testConnection(){
