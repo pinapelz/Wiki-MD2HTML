@@ -17,6 +17,7 @@ message(STATUS "Binary directory: ${CMAKE_BINARY_DIR}")
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/markdown_translator.cpp
+    src/utils/rclone_uploader.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)

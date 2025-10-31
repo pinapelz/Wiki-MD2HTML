@@ -4,6 +4,8 @@
 #include <sstream>
 #include <unordered_map>
 #include "markdown_translator.hpp"
+#include "file_uploader.hpp"
+#include "rclone_uploader.hpp"
 
 bool parseArguments(int argc, char* argv[], std::unordered_map<std::string, std::string>& params, std::string& inputFile) {
     if (argc < 2) {
@@ -43,6 +45,10 @@ bool parseArguments(int argc, char* argv[], std::unordered_map<std::string, std:
 int main(int argc, char* argv[]) {
     std::unordered_map<std::string, std::string> params;
     std::string inputFile;
+
+    // FileUploader* fileupload;
+    // fileupload = new RcloneUploader("", "r2");
+    // std::cout << fileupload->testConnection() << std::endl;
 
     if (!parseArguments(argc, argv, params, inputFile)) {
         return 1;
