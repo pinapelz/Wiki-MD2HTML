@@ -626,3 +626,132 @@ img {
 .main-content > * {
     animation: fadeIn 0.6s ease-out;
 }
+
+/* ============================================================
+   Lock screen — encrypted posts
+   ============================================================ */
+
+/* The data holder is invisible; only the lock UI is shown */
+#encrypted-content {
+    display: none;
+}
+
+/* Full-viewport overlay */
+#lock-screen {
+    position: fixed;
+    inset: 0;
+    background-color: var(--primary-bg);
+    background-image: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255, 255, 255, 0.01) 10px,
+        rgba(255, 255, 255, 0.01) 20px
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Card */
+#lock-box {
+    background-color: var(--secondary-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 2.75rem 3rem;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.1rem;
+    box-shadow:
+        0 12px 50px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(201, 170, 113, 0.07);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Gradient top-accent bar */
+#lock-box::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-gold), var(--accent-blue));
+}
+
+/* Lock emoji */
+.lock-icon {
+    font-size: 2.6rem;
+    line-height: 1;
+    margin-bottom: 0.15rem;
+}
+
+/* Override the global h2 blue/border-left styles inside the lock box */
+#lock-box h2 {
+    font-family: "Jupiter Pro", "Cinzel", "Georgia", serif;
+    font-size: 1.35rem;
+    font-weight: 500;
+    letter-spacing: 1px;
+    color: var(--accent-gold);
+    -webkit-text-fill-color: var(--accent-gold);
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+    text-shadow: none;
+    border-left: none;
+    padding-left: 0;
+    margin-left: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    position: static;
+}
+
+#lock-box p {
+    color: var(--text-dim);
+    font-size: 0.87rem;
+    margin: 0;
+    text-align: center;
+}
+
+/* Password input */
+#enc-input {
+    background-color: var(--tertiary-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.65rem 1rem;
+    border-radius: 6px;
+    width: 100%;
+    font-size: 0.95rem;
+    font-family: inherit;
+    text-align: center;
+    letter-spacing: 0.05em;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#enc-input::placeholder {
+    color: var(--text-dim);
+    letter-spacing: 0;
+}
+
+#enc-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow:
+        0 0 0 3px rgba(91, 143, 199, 0.12),
+        inset 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 480px) {
+    #lock-box {
+        padding: 2rem 1.5rem;
+    }
+}
+
+
